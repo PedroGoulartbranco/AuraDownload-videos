@@ -1,65 +1,84 @@
-import Image from "next/image";
+"use client"
+import { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Play, Music2, X, Info } from "lucide-react"
+
+// 1. Definição dos temas
+const PLATFORMS = {
+  youtube: {
+    name: "YouTube",
+    color: "text-red-600",
+    bgGlow: "from-red-200/50",
+    button: "bg-red-600",
+    icon: <Play className="w-12 h-12 text-red-600" />,
+    placeholder: "busque ou cole um link do youtube"
+  },
+  tiktok: {
+    name: "TikTok",
+    color: "text-zinc-900",
+    bgGlow: "from-cyan-200/40 via-pink-200/40",
+    button: "bg-zinc-900",
+    icon: <Music2 className="w-12 h-12 text-zinc-900" />,
+    placeholder: "cole um link do tiktok aqui"
+  },
+  twitter: {
+    name: "Twitter",
+    color: "text-blue-500",
+    bgGlow: "from-blue-200/50",
+    button: "bg-black",
+    icon: <X className="w-12 h-12 text-black" />, // <--- Aqui agora é X
+    placeholder: "cole o link do post (X)"
+  }
+}
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<keyof typeof PLATFORMS>("youtube")
+  const current = PLATFORMS[activeTab]
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    // O fundo muda de cor suavemente baseado no tema
+    <main className={`min-h-screen relative overflow-hidden transition-colors duration-700 bg-white`}>
+
+      {/* Background Glow (O gradiente do seu protótipo) */}
+      <div className={`absolute inset-0 bg-gradient-to-b ${current.bgGlow} to-white -z-10`} />
+
+      {/* Navbar Minimalista */}
+      <nav className="flex justify-center gap-8 p-8 text-lg font-medium text-zinc-500">
+        <button onClick={() => setActiveTab("youtube")} className={activeTab === 'youtube' ? 'text-black border-b-2 border-red-600' : ''}>youtube</button>
+        <button onClick={() => setActiveTab("tiktok")} className={activeTab === 'tiktok' ? 'text-black border-b-2 border-zinc-900' : ''}>tiktok</button>
+        <button className="hover:text-black">sobre</button>
+      </nav>
+
+      {/* Área Central Animada */}
+      <div className="max-w-4xl mx-auto flex flex-col items-center justify-center pt-20 px-4">
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab} // Isso faz o Framer Motion saber que deve animar a troca
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col items-center text-center"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+            <div className="mb-6">{current.icon}</div>
+            <h1 className="text-6xl font-bold tracking-tighter mb-12">
+              titulo foda <br />
+              <span className={current.color}>({current.name.toLowerCase()})</span>
+            </h1>
+
+            {/* Input Estilizado do seu Protótipo */}
+            <div className="relative w-full max-w-md">
+              <input
+                type="text"
+                placeholder={current.placeholder}
+                className={`w-full py-4 px-6 rounded-full border-2 border-black/10 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all ${current.button} text-white placeholder:text-white/70`}
+              />
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+      </div>
+    </main>
+  )
 }

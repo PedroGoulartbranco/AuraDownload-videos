@@ -1,4 +1,5 @@
 import yt_dlp
+import os
 
 def youtube_informacoes_video(url):
     opcoes = {
@@ -12,5 +13,14 @@ def youtube_informacoes_video(url):
 
         return {
             "titulo": informacoes.get('title'),
-            "criador": informacoes.get('uploader')
+            "criador": informacoes.get('uploader'),
+            "views": informacoes.get('view_count'),
+            "likes": informacoes.get('like_count'),
+            "duracao": informacoes.get("duration_string"),
+            "resolucao": informacoes.get("resolution"),
+            "thumbnail": informacoes.get("thumbnail")
         }
+    
+def youtube_baixar_mp4():
+    file_download = "./dowloads"
+    

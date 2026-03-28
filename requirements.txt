@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pydantic
+yt-dlp
+python-dotenv
+instaloader
+TikTokApi
+google-generativeai
+requests
+gunicorn

@@ -1,31 +1,40 @@
 # Dependências (Node e Python)
 node_modules/
+**/node_modules/
 venv/
 env/
 .venv/
 __pycache__/
 *.pyc
 
-# Next.js (Cache e Build)
+# Next.js (Cache, Build e Traces)
 .next/
+**/.next/
 out/
 build/
 .vercel
-
-# Cache do Turbopack (O que causou o erro de 100MB)
 .turbo/
+trace
+**/trace
 
-# Arquivos de Sistema
-.DS_Store
-Thumbs.db
-*.pem
+# Arquivos de Cache do Turbopack (O que apareceu no seu log)
+**/dev/cache/turbopack/
+**/CURRENT
+**/MANIFEST-*
+**/LOCK
+**/LOG
+**/LOG.old
 
-# Testes e Logs
-coverage/
+# Logs e Mapas de código
+*.log
+*.map
+*.css.map
+*.js.map
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+next-development.log
 
 # Variáveis de Ambiente (Segurança)
 .env
@@ -34,15 +43,16 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# TypeScript
+# TypeScript e Outros
 *.tsbuildinfo
 next-env.d.ts
+.DS_Store
+Thumbs.db
+*.pem
 
-# Ignora os executáveis do FFmpeg
+# FFmpeg e Downloads
 ffmpeg.exe
 ffprobe.exe
-
-# Ignora a pasta de downloads e arquivos temporários de vídeo
 backend/downloads/
 downloads/
 *.part

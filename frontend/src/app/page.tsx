@@ -212,7 +212,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SOBRE: FULL SCREEN E LIMPO */}
+      { }
       <footer id="about" className="min-h-screen w-full bg-zinc-900 px-8 flex flex-col items-center justify-center text-center mt-auto py-20">
         <div className="max-w-4xl w-full space-y-16">
           <div className="space-y-6">

@@ -58,3 +58,5 @@ downloads/
 *.part
 *.ytdl
 *.f*
+/frontend/.next/dev/logs
+*.log

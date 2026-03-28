@@ -7,7 +7,7 @@ export async function sendLinkToBackend(url: string, endpoint: string) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ url: url }), // Formato exato solicitado
+      body: JSON.stringify({ url: url }),
     });
 
     if (!response.ok) {
@@ -16,7 +16,6 @@ export async function sendLinkToBackend(url: string, endpoint: string) {
 
     const data = await response.json();
     
-    // Retorna os dados dentro da chave 'dados' se existir, senão o objeto todo
     return data.dados ? data.dados : data;
   } catch (error) {
     console.error("Erro na chamada API:", error);

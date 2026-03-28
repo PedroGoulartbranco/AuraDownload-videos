@@ -18,3 +18,9 @@ async def Youtube_mandar_informacoes_video(requisicao: VideoRequest):
         "status": "Ok",
         "dados": informacoes_video
     }
+
+@router.post("/baixar_video_youtube")
+async def youtube_baixar_video(qualidade: VideoQuality):
+   link_recebido = qualidade.url
+   qualidade = qualidade.url
+   return None

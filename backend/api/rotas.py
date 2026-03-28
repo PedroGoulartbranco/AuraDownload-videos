@@ -1,18 +1,20 @@
 from fastapi import APIRouter
+from api.models import *
+from services.downloader import *
 
 router = APIRouter()
 
 @router.get("/")
-async def pagina_incial():
+async def teste():
     return {
-        "mensagem": "Seu viado",
-        "status": "Tudo Okkk!"
+        "mensagem": "Seu gay"
     }
 
-@router.get("/teste")
-async def teste(url: str):
+@router.post("/youtube")
+async def Youtube_mandar_informacoes_video(requisicao: VideoRequest):
+    link_recebido = requisicao.url
+    informacoes_video = youtube_informacoes_video(link_recebido)
     return {
-        "status": "online",
-        "url": url,
-        "mensagem": "Seu viado"
+        "status": "Ok",
+        "dados": informacoes_video
     }

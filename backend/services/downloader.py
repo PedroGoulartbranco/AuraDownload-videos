@@ -1,8 +1,8 @@
 import yt_dlp
 import os
 
-PASTA_SERVICES = os.path.dirname(os.path.abspath(__file__))
-PASTA_BACKEND = os.path.dirname(PASTA_SERVICES)
+PASTA_ATUAL = os.path.dirname(os.path.abspath(__file__))
+PASTA_BACKEND = os.path.abspath(os.path.join(PASTA_ATUAL, ".."))
 PASTA_DOWNLOADS = os.path.join(PASTA_BACKEND, "downloads")
 CAMINHO_FFMPEG = os.path.join(PASTA_BACKEND, "ffmpeg.exe")
 
@@ -28,18 +28,26 @@ def youtube_informacoes_video(url):
     
 def youtube_baixar_videos(url, qualidade):
     os.makedirs(PASTA_DOWNLOADS, exist_ok=True) #Se a pasta nao existir ele cria
+    print(qualidade)
     opcoes = {
-        'format': f'bestvideo[height<={qualidade}]+bestaudio/best[height<={qualidade}]',
+
+        'format': f'bestvideo[height<={qualidade}][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+        
         'outtmpl': os.path.join(PASTA_DOWNLOADS, '%(title)s.%(ext)s'),
         'merge_output_format': 'mp4',
         'ffmpeg_location': CAMINHO_FFMPEG,
+        
+        # Evita erros com emojis, aspas e espaços que bugam o FFmpeg no Windows
+        'restrictfilenames': True, 
+        'noplaylist': True,
+        'quiet': False, # Importante para você ver o log no terminal
+        'verbose': True
     }
     try:
         with yt_dlp.YoutubeDL(opcoes) as ydl:
             print("Começou")
             informacoes = ydl.extract_info(url, download=True)
             caminho_final = ydl.prepare_filename(informacoes)
-            caminho_final = caminho_final.rsplit('.', 1)[0] + '.mp4'
             return caminho_final#Manda o nome do caminho certo tudo já arrumado
     except Exception as e:
         return None

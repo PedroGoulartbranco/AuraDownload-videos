@@ -1,10 +1,17 @@
-from fastapi import APIRouter, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from api.models import *
 from services.downloader import *
 import os
 from fastapi.responses import FileResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+import asyncio
 
 router = APIRouter()
+
+limiter = Limiter(key_func=get_remote_address) #Para limitar as requisições por IP
+download_limite = asyncio.Semaphore(50) #Limita o servidor para ter no maximo 50 downloads ao mesmo tempo
 
 @router.get("/")
 async def teste():
@@ -22,16 +29,23 @@ async def Youtube_mandar_informacoes_video(requisicao: VideoRequest):
     }
 
 @router.post("/baixar_video_youtube")
-async def youtube_baixar_video(qualidade: VideoQuality):
-    link_recebido = qualidade.url
-    qualidade = qualidade.resolution
-    caminho_video = youtube_baixar_videos(link_recebido, qualidade)
-    if caminho_video and os.path.exists(caminho_video):
-        print(os.path.basename(caminho_video))
-        BackgroundTasks.add_task(excluir_video,caminho_video) #Não pode colocar () na função porque se nao executa na hora
-        return FileResponse(
-            path=caminho_video, 
-            filename=os.path.basename(caminho_video), # Pega só o nome do arquivo
-            media_type='video/mp4'
+@limiter.limit("3/minute")
+async def youtube_baixar_video(qualidade: VideoQuality, background_tasks: BackgroundTasks, request: Request):
+    if download_limite._value == 0: #== 0 significa que tem 0 vagas na fila
+        raise HTTPException(status_code=503, detail="Servidor lotado! Tente em 1 minuto.")
+    async with download_limite:
+        link_recebido = qualidade.url
+        qualidade_video = qualidade.resolution
+        caminho_video = youtube_baixar_videos(link_recebido, qualidade_video)
+        if caminho_video and os.path.exists(caminho_video):
+            print(os.path.basename(caminho_video))
+            background_tasks.add_task(excluir_video,caminho_video) #Não pode colocar () na função porque se nao executa na hora
+            return FileResponse(
+                path=caminho_video, 
+                filename=os.path.basename(caminho_video), # Pega só o nome do arquivo
+                media_type='video/mp4'
+            )
+        raise HTTPException(
+            status_code=400, 
+            detail="Não foi possível baixar o vídeo. Verifique se o link do YouTube é válido ou se a qualidade escolhida está disponível."
         )
-    return {"erro": "Não foi possível baixar o vídeo. Verifique o link ou a qualidade."}

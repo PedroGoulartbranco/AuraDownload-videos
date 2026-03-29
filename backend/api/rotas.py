@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, BackgroundTasks
 from api.models import *
 from services.downloader import *
 import os
@@ -28,6 +28,7 @@ async def youtube_baixar_video(qualidade: VideoQuality):
     caminho_video = youtube_baixar_videos(link_recebido, qualidade)
     if caminho_video and os.path.exists(caminho_video):
         print(os.path.basename(caminho_video))
+        BackgroundTasks.add_task(excluir_video,caminho_video) #Não pode colocar () na função porque se nao executa na hora
         return FileResponse(
             path=caminho_video, 
             filename=os.path.basename(caminho_video), # Pega só o nome do arquivo

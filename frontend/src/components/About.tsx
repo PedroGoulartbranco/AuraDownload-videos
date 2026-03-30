@@ -7,7 +7,7 @@ export function About() {
         <footer id="about" className="min-h-screen w-full bg-zinc-900 px-8 flex flex-col items-center justify-center text-center mt-auto py-20">
             <div className="max-w-4xl w-full space-y-16">
                 
-                {/* Header do Sobre */}
+                { }
                 <div className="space-y-6 text-center">
                     <motion.div 
                         initial={{ opacity: 0, y: 10 }}
@@ -26,10 +26,10 @@ export function About() {
                     </p>
                 </div>
 
-                {/* Grid de Criadores com Hover Fluido */}
+                { }
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto w-full">
                     
-                    {/* Card Vitor */}
+                    { }
                     <motion.div 
                         whileHover={{ 
                             y: -12, 
@@ -52,7 +52,7 @@ export function About() {
                         </div>
                     </motion.div>
 
-                    {/* Card Pedro */}
+                    { }
                     <motion.div 
                         whileHover={{ 
                             y: -12, 
@@ -77,7 +77,7 @@ export function About() {
 
                 </div>
 
-                {/* Rodapé Final */}
+                { }
                 <div className="pt-12 flex flex-col items-center gap-8">
                     <div className="flex gap-10">
                         <motion.button whileHover={{ scale: 1.2, rotate: 5 }} className="text-zinc-600 hover:text-white transition-colors">

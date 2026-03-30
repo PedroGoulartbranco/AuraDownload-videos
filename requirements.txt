@@ -8,3 +8,4 @@ TikTokApi
 google-generativeai
 requests
 gunicorn
+slowapi

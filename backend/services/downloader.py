@@ -51,3 +51,7 @@ def youtube_baixar_videos(url, qualidade):
             return caminho_final#Manda o nome do caminho certo tudo já arrumado
     except Exception as e:
         return None
+    
+def excluir_video(caminho):
+    if os.path.exists:
+        os.remove(caminho)

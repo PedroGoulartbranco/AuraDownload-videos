@@ -44,6 +44,27 @@ async def youtube_baixar_video(qualidade: VideoQuality, background_tasks: Backgr
             detail="Não foi possível baixar o vídeo. Verifique se o link do YouTube é válido ou se a qualidade escolhida está disponível."
         )
     
+@router.post("/baixar_audio_youtube")
+@limiter.limit("15/minute")
+async def youtube_baixar_video(background_tasks: BackgroundTasks, request: Request, qualidade: AudioQuality):
+    if download_limite._value == 0: #== 0 significa que tem 0 vagas na fila
+        raise HTTPException(status_code=503, detail="Servidor lotado! Tente em 1 minuto.")
+    async with download_limite:
+        link_recebido = qualidade.url
+        qualidade_audio = qualidade.quality_audio
+        caminho_audio = youtube_baixar_audio(link_recebido, qualidade_audio)
+        if caminho_audio and os.path.exists(caminho_audio):
+            background_tasks.add_task(excluir_video,caminho_audio) #Não pode colocar () na função porque se nao executa na hora
+            return FileResponse(
+                path=caminho_audio, 
+                filename=os.path.basename(caminho_audio), # Pega só o nome do arquivo
+                media_type='audio/mpeg'
+            )
+        raise HTTPException(
+            status_code=400, 
+            detail="Não foi possível baixar o áudio. Verifique se o link do YouTube é válido ou se a qualidade escolhida está disponível."
+        )
+
 @router.post("/youtube_tamanho_qualidade")
 async def youtube_mandar_tamanho(requisicao: VideoRequest):
      link_recebido = requisicao.url

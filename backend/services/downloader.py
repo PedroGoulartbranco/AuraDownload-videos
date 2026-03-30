@@ -79,3 +79,30 @@ def mandar_tamanho_resolucoes(url):
 def excluir_video(caminho):
     if os.path.exists:
         os.remove(caminho)
+
+def youtube_baixar_audio(url, qualidade):
+    os.makedirs(PASTA_DOWNLOADS, exist_ok=True) #Se a pasta nao existir ele cria
+    opcoes = {
+    'format': f'bestaudio[abr<={qualidade}]/bestaudio',
+    
+    'outtmpl': os.path.join(PASTA_DOWNLOADS, '%(title)s.%(ext)s'),
+    
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        'preferredquality': qualidade, 
+    }],
+    
+    'ffmpeg_location': CAMINHO_FFMPEG,
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'quiet': False,
+    }
+    try:
+        with yt_dlp.YoutubeDL(opcoes) as ydl:
+            informacoes = ydl.extract_info(url, download=True)
+            caminho_final = ydl.prepare_filename(informacoes)
+            caminho_final = os.path.splitext(caminho_final)[0] + ".mp3"
+            return caminho_final
+    except Exception as e:
+        return None

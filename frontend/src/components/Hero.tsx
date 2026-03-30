@@ -40,7 +40,7 @@ export function Hero({ current, url, setUrl, loading, error, onScrollToFeatures 
                 {error && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-500 font-bold text-xs bg-red-50 py-2 rounded-xl border border-red-100">{error}</motion.p>}
             </div>
 
-            {/* BOTÃO CORRIGIDO */}
+            { }
             <motion.button
                 onClick={onScrollToFeatures}
                 className="mt-12 flex flex-col items-center gap-2 text-zinc-300 hover:text-zinc-500 transition-colors cursor-pointer group"

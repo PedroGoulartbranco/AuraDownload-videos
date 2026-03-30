@@ -49,3 +49,9 @@ async def youtube_baixar_video(qualidade: VideoQuality, background_tasks: Backgr
             status_code=400, 
             detail="Não foi possível baixar o vídeo. Verifique se o link do YouTube é válido ou se a qualidade escolhida está disponível."
         )
+    
+@router.post("/youtube_tamanho_qualidade")
+async def youtube_mandar_tamanho(requisicao: VideoRequest):
+     link_recebido = requisicao.url
+     tamanhos = mandar_tamanho_resolucoes(link_recebido)
+     return  tamanhos

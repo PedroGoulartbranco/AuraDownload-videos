@@ -11,4 +11,4 @@ class VideoRequest(BaseModel):
 
 class VideoQuality(BaseModel):
     url: str
-    resolution: Literal["144", "240","360", "480","720", "1080", "1440"] #O literal faz só aceitar nesses modelos
+    resolution: Literal["144", "240","360","480","720", "1080", "1440"] #O literal faz só aceitar nesses modelos

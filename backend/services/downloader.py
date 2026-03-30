@@ -15,7 +15,8 @@ def youtube_informacoes_video(url):
 
     with yt_dlp.YoutubeDL(opcoes) as ydl:
         informacoes = ydl.extract_info(url, download=False)
-
+        # tamanho = informacoes.get('filesize') or informacoes.get('filesize_approx') or 0
+        # tamanho = round(tamanho / (1024 * 1024), 2) # Converte Bytes para MB
         return {
             "titulo": informacoes.get('title'),
             "criador": informacoes.get('uploader'),
@@ -23,7 +24,7 @@ def youtube_informacoes_video(url):
             "likes": informacoes.get('like_count'),
             "duracao": informacoes.get("duration_string"),
             "resolucao": informacoes.get("resolution"),
-            "thumbnail": informacoes.get("thumbnail")
+            "thumbnail": informacoes.get("thumbnail"),
         }
     
 def youtube_baixar_videos(url, qualidade):
@@ -51,6 +52,27 @@ def youtube_baixar_videos(url, qualidade):
             return caminho_final#Manda o nome do caminho certo tudo já arrumado
     except Exception as e:
         return None
+    
+def mandar_tamanho_resolucoes(url):
+    opcoes = {
+        'quiet': True,      
+        'no_warnings': True,
+        'format': 'best',       
+    }
+    with yt_dlp.YoutubeDL(opcoes) as ydl:
+        informacoes = ydl.extract_info(url, download=False)
+
+        tamanhos_por_resolucao = {}
+
+        for formato in informacoes.get("formats"):
+            altura = formato.get('height')
+            tamanho = formato.get('filesize') or formato.get('filesize_approx') or 0
+
+            #Filta só os que tem imagem e tamanho
+            if altura and formato.get("vcodec") is not None and formato.get("vcodec") != 'none' and tamanho > 0:
+                tamanho = round(tamanho / (1024 * 1024), 2) #Tranformas em MB
+                tamanhos_por_resolucao[f"tamanho_{altura}"] = tamanho
+    return tamanhos_por_resolucao
     
 def excluir_video(caminho):
     if os.path.exists:

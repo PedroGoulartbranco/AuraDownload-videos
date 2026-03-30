@@ -3,13 +3,15 @@ import { useState, useEffect } from "react"
 import { AnimatePresence } from "framer-motion"
 import { Play, Music2 } from "lucide-react"
 
+// Chamadas de API
 import {
   sendLinkToBackend,
   downloadYoutubeVideo,
+  downloadYoutubeAudio,
   fetchYoutubeResolutions
 } from "@/services/api"
 
-// Importação dos Componentes
+// Componentes
 import { Navbar } from "@/components/Navbar"
 import { Hero } from "@/components/Hero"
 import { ResultCard } from "@/components/ResultCard"
@@ -38,36 +40,32 @@ export const PLATFORMS = {
 }
 
 const QUALITY_LABELS: Record<string, string> = {
-  "2160": "4K Ultra HD",
-  "1440": "2K Quad HD",
-  "1080": "Full HD",
-  "720": "HD",
-  "480": "SD",
-  "360": "Basic",
-  "240": "Mobile",
-  "144": "Data Saver"
+  "2160": "4K Ultra HD", "1440": "2K Quad HD", "1080": "Full HD",
+  "720": "HD", "480": "SD", "360": "Basic", "240": "Mobile", "144": "Data Saver"
 };
 
 export default function Home() {
+  // --- ESTADOS ---
   const [activeTab, setActiveTab] = useState<keyof typeof PLATFORMS>("youtube")
   const [url, setUrl] = useState("")
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [loadingRes, setLoadingRes] = useState(false)
   const [videoData, setVideoData] = useState<any>(null)
-  const [isVertical, setIsVertical] = useState(false)
+  const [resolutionsData, setResolutionsData] = useState<any>(null)
+  const [error, setError] = useState("")
   const [showAnalysis, setShowAnalysis] = useState(false)
+  const [isVertical, setIsVertical] = useState(false)
   const [view, setView] = useState<"options" | "resolutions" | "audio">("options")
 
-  const [loadingRes, setLoadingRes] = useState(false)
-  const [resolutionsData, setResolutionsData] = useState<any>(null)
+  // Seleção e Download
   const [selectedRes, setSelectedRes] = useState("1080")
+  const [selectedBitrate, setSelectedBitrate] = useState("320")
   const [isDownloading, setIsDownloading] = useState(false)
-
-  const [selectedBitrate, setSelectedBitrate] = useState("320kbps")
   const [isDownloadingAudio, setIsDownloadingAudio] = useState(false)
 
   const current = PLATFORMS[activeTab]
 
+  // Mapeamento dinâmico das resoluções vindo do Pedro
   const dynamicResolutions = resolutionsData
     ? Object.entries(resolutionsData).map(([resKey, size]: any) => {
       const cleanLabel = resKey.replace("tamanho_", "").replace("p", "");
@@ -83,10 +81,11 @@ export default function Home() {
     const triggerAutoProcess = async () => {
       if (!url.trim()) { setError(""); return; }
       if (!current.regex.test(url)) {
-        setError(`Link inválido para ${current.name.toUpperCase()}`);
+        setError(`Formato inválido para ${current.name.toUpperCase()}`);
         setVideoData(null);
         return;
       }
+
       setError("");
       const isShorts = url.includes("/shorts/") || url.includes("tiktok.com");
       setIsVertical(isShorts);
@@ -94,19 +93,21 @@ export default function Home() {
       setResolutionsData(null);
 
       try {
+        // 1. Busca Info Básica
         const info = await sendLinkToBackend(url, current.endpoint);
         setVideoData(info);
         setView("options");
         setLoading(false);
 
+        // 2. Busca Resoluções em Background
         setLoadingRes(true);
         const resInfo = await fetchYoutubeResolutions(url);
         setResolutionsData(resInfo);
 
         if (resInfo) {
           const keys = Object.keys(resInfo).map(k => k.replace("tamanho_", "").replace("p", ""));
-          const sortedKeys = keys.sort((a, b) => parseInt(b) - parseInt(a));
-          setSelectedRes(sortedKeys[0]);
+          const sorted = keys.sort((a, b) => parseInt(b) - parseInt(a));
+          setSelectedRes(sorted[0]);
         }
       } catch (err) {
         setError("Erro na conexão com o servidor.");
@@ -118,7 +119,7 @@ export default function Home() {
     triggerAutoProcess();
   }, [url, activeTab]);
 
-  // --- FUNÇÃO DOWNLOAD MP4 ---
+  // Handler MP4
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
@@ -132,21 +133,36 @@ export default function Home() {
       link.click();
       link.parentNode?.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
+    } catch (err) { alert("Erro ao processar download."); } finally { setIsDownloading(false); }
+  };
+
+  const handleAudioDownload = async () => {
+    setIsDownloadingAudio(true);
+    try {
+      // Chamando a função do api.ts e passando o valor (ex: "320", "192", "128")
+      const blob = await downloadYoutubeAudio(url, selectedBitrate);
+
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+
+      const cleanTitle = videoData.titulo ? videoData.titulo.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'audio';
+      link.setAttribute('download', `${cleanTitle}.mp3`);
+
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
-      alert("Erro ao baixar o vídeo.");
+      alert("Erro ao baixar áudio.");
     } finally {
-      setIsDownloading(false);
+      setIsDownloadingAudio(false);
     }
   };
 
   const resetAll = () => {
-    setVideoData(null);
-    setResolutionsData(null);
-    setUrl("");
-    setError("");
-    setView("options");
-    setShowAnalysis(false);
-    setIsDownloadingAudio(false);
+    setVideoData(null); setResolutionsData(null); setUrl(""); setError("");
+    setView("options"); setShowAnalysis(false); setIsDownloadingAudio(false);
   };
 
   const scrollToSection = (id: string) => {
@@ -155,11 +171,11 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen relative overflow-x-hidden bg-white flex flex-col items-center transition-colors duration-700">
+    <main className="min-h-screen relative overflow-x-hidden bg-zinc-100 flex flex-col items-center transition-colors duration-700">
       <div className={`absolute inset-0 bg-gradient-to-b ${current.bgGlow} to-white -z-10 transition-all duration-700`} />
-      
+
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} onReset={resetAll} onScroll={scrollToSection} />
-      
+
       <div className="max-w-4xl w-full flex flex-col items-center justify-center pt-4 px-4 z-10 text-center min-h-[80vh]">
         <AnimatePresence mode="wait">
           {!videoData ? (
@@ -170,7 +186,7 @@ export default function Home() {
               isVertical={isVertical}
               view={view}
               setView={setView}
-              
+
               // Props Vídeo
               selectedRes={selectedRes}
               setSelectedRes={setSelectedRes}
@@ -179,13 +195,11 @@ export default function Home() {
               resolutions={dynamicResolutions}
               loadingRes={loadingRes}
 
-              // Props Áudio
               selectedBitrate={selectedBitrate}
               setSelectedBitrate={setSelectedBitrate}
               isDownloadingAudio={isDownloadingAudio}
               onAudioDownload={handleAudioDownload}
 
-              // Props Gerais
               showAnalysis={showAnalysis}
               setShowAnalysis={setShowAnalysis}
               onReset={resetAll}
@@ -194,7 +208,7 @@ export default function Home() {
           )}
         </AnimatePresence>
       </div>
-      
+
       {!videoData && <Features />}
       <About />
     </main>

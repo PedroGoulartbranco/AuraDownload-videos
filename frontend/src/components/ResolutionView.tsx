@@ -15,7 +15,7 @@ export function ResolutionView({
     <motion.div
       key="resolutions"
       initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
+      animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -20 }}
       className="w-full px-4"
     >
@@ -29,21 +29,24 @@ export function ResolutionView({
           >
             <ChevronLeft size={20} />
           </button>
-          <h3 className="font-black text-zinc-800 uppercase tracking-widest text-[10px]">
-            Qualidade de vídeo
-          </h3>
+          <div className="text-center">
+            <h3 className="font-black text-zinc-800 uppercase tracking-widest text-[10px]">
+              Qualidade de vídeo
+            </h3>
+            <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-tighter">Tamanhos aproximados</p>
+          </div>
           <div className="w-8" />
         </div>
 
-        {/* Listagem de Resoluções Ordenada */}
+        {/* Lista de Resoluções */}
         <div className="space-y-2 mb-8 max-h-[280px] overflow-y-auto pr-2 custom-scrollbar">
           {resolutions.map((res: any) => (
             <button
               key={res.label}
               onClick={() => setSelectedRes(res.label)}
               className={`w-full p-4 rounded-2xl border-2 transition-all flex items-center justify-between group ${selectedRes === res.label
-                  ? 'border-zinc-900 bg-zinc-900 text-white shadow-lg'
-                  : 'border-zinc-50 bg-zinc-50 text-zinc-500 hover:border-zinc-200'
+                ? 'border-zinc-900 bg-zinc-900 text-white shadow-lg'
+                : 'border-zinc-50 bg-zinc-50 text-zinc-500 hover:border-zinc-200'
                 }`}
             >
               <div className="flex items-center gap-3">
@@ -52,7 +55,6 @@ export function ResolutionView({
                 </div>
 
                 <div className="flex flex-col text-left">
-                  {/* Exibe apenas o número + p */}
                   <span className={`font-black text-sm leading-none ${selectedRes === res.label ? 'text-white' : 'text-zinc-900'}`}>
                     {res.label}p
                   </span>
@@ -63,14 +65,17 @@ export function ResolutionView({
                 </div>
               </div>
 
-              <span className="text-[10px] font-bold opacity-60 flex items-center gap-1">
-                <HardDrive size={12} /> {res.size}
-              </span>
+              {/* TAMANHO ESTIMADO: Adicionei o símbolo "~" e deixei a HardDrive mais sutil */}
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] font-bold flex items-center gap-1">
+                  <HardDrive size={10} className="opacity-50" />
+                  ~{res.size}
+                </span>
+              </div>
             </button>
           ))}
         </div>
 
-        {/* Botão de Download */}
         <button
           onClick={onDownload}
           disabled={isDownloading}

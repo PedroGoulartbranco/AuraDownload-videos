@@ -14,14 +14,14 @@ export function OptionsView({ videoData, setView, setShowAnalysis, showAnalysis,
       </div>
 
       <div className="flex gap-4 w-full mb-4 px-4">
-        {/* BOTÃO MP4 COM LOADING INTELIGENTE */}
+        { }
         <button
           onClick={() => !loadingRes && setView("resolutions")}
           disabled={loadingRes}
           className={`flex-1 py-6 bg-zinc-900 text-white rounded-[2rem] font-black transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-2 shadow-2xl ${loadingRes ? 'opacity-70 cursor-wait' : ''}`}
         >
           {loadingRes ? (
-            <Loader2 className="animate-spin" size={20} />
+            <Loader2 className="animate-spin" size={10} />
           ) : (
             <FileVideo size={20} />
           )}
@@ -29,7 +29,7 @@ export function OptionsView({ videoData, setView, setShowAnalysis, showAnalysis,
         </button>
 
         <button
-          onClick={() => setView("audio")} // Agora ele abre a tela de áudio
+          onClick={() => setView("audio")}
           className="flex-1 py-6 bg-white text-zinc-900 rounded-[2rem] font-black transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-2 border-2 border-zinc-100 shadow-xl"
         >
           <Music size={20} /> MP3

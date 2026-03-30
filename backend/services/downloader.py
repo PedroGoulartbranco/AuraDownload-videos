@@ -29,7 +29,6 @@ def youtube_informacoes_video(url):
     
 def youtube_baixar_videos(url, qualidade):
     os.makedirs(PASTA_DOWNLOADS, exist_ok=True) #Se a pasta nao existir ele cria
-    print(qualidade)
     opcoes = {
 
         'format': f'bestvideo[height<={qualidade}][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
@@ -46,7 +45,6 @@ def youtube_baixar_videos(url, qualidade):
     }
     try:
         with yt_dlp.YoutubeDL(opcoes) as ydl:
-            print("Começou")
             informacoes = ydl.extract_info(url, download=True)
             caminho_final = ydl.prepare_filename(informacoes)
             return caminho_final#Manda o nome do caminho certo tudo já arrumado
@@ -63,6 +61,8 @@ def mandar_tamanho_resolucoes(url):
         informacoes = ydl.extract_info(url, download=False)
 
         tamanhos_por_resolucao = {}
+        duracao_segundos = informacoes.get('duration', 0)
+        audio_estimado_mb = duracao_segundos * 0.018 #Estimativa que o gemini falou que é 0.015Mb por audio
 
         for formato in informacoes.get("formats"):
             altura = formato.get('height')
@@ -70,10 +70,39 @@ def mandar_tamanho_resolucoes(url):
 
             #Filta só os que tem imagem e tamanho
             if altura and formato.get("vcodec") is not None and formato.get("vcodec") != 'none' and tamanho > 0:
-                tamanho = round(tamanho / (1024 * 1024), 2) #Tranformas em MB
-                tamanhos_por_resolucao[f"tamanho_{altura}"] = tamanho
+                if int(altura) != 608 and int(altura) != 2160:
+                    tamanho = tamanho / (1024 * 1024) #Tranformas em MB
+                    tamanho = round(tamanho + audio_estimado_mb, 2)
+                    tamanhos_por_resolucao[f"tamanho_{altura}"] = tamanho
     return tamanhos_por_resolucao
     
 def excluir_video(caminho):
     if os.path.exists:
         os.remove(caminho)
+
+def youtube_baixar_audio(url, qualidade):
+    os.makedirs(PASTA_DOWNLOADS, exist_ok=True) #Se a pasta nao existir ele cria
+    opcoes = {
+    'format': f'bestaudio[abr<={qualidade}]/bestaudio',
+    
+    'outtmpl': os.path.join(PASTA_DOWNLOADS, '%(title)s.%(ext)s'),
+    
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        'preferredquality': qualidade, 
+    }],
+    
+    'ffmpeg_location': CAMINHO_FFMPEG,
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'quiet': False,
+    }
+    try:
+        with yt_dlp.YoutubeDL(opcoes) as ydl:
+            informacoes = ydl.extract_info(url, download=True)
+            caminho_final = ydl.prepare_filename(informacoes)
+            caminho_final = os.path.splitext(caminho_final)[0] + ".mp3"
+            return caminho_final
+    except Exception as e:
+        return None

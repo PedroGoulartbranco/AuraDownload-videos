@@ -13,12 +13,6 @@ router = APIRouter()
 limiter = Limiter(key_func=get_remote_address) #Para limitar as requisições por IP
 download_limite = asyncio.Semaphore(50) #Limita o servidor para ter no maximo 50 downloads ao mesmo tempo
 
-@router.get("/")
-async def teste():
-    return {
-        "mensagem": "Seu gay"
-    }
-
 @router.post("/youtube")
 async def Youtube_mandar_informacoes_video(requisicao: VideoRequest):
     link_recebido = requisicao.url

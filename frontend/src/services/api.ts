@@ -59,19 +59,33 @@ export async function downloadYoutubeVideo(url: string, resolution: string) {
   }
 }
 
-export async function downloadYoutubeAudio(url: string, selectedOption: string) {
+export async function fetchYoutubeAudioQualities(url: string) {
+  try {
+    const response = await fetch(`${BACKEND_URL}/youtube_audio_tamanho`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: url }),
+    });
+    if (!response.ok) throw new Error("Erro ao buscar qualidades de áudio");
+    const data = await response.json();
+    return data.dados ? data.dados : data;
+  } catch (error) {
+    console.error("Erro API Áudio:", error);
+    throw error;
+  }
+}
+
+export async function downloadYoutubeAudio(url: string, quality: string) {
   try {
     const response = await fetch(`${BACKEND_URL}/baixar_audio_youtube`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         url: url,
-        quality_audio: selectedOption
+        quality_audio: quality  
       }),
     });
-
-    if (!response.ok) throw new Error("Erro ao baixar o áudio do servidor");
-
+    if (!response.ok) throw new Error("Erro no download de áudio");
     return await response.blob();
   } catch (error) {
     console.error("Erro no download de áudio:", error);

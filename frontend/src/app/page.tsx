@@ -8,7 +8,8 @@ import {
   sendLinkToBackend,
   downloadYoutubeVideo,
   downloadYoutubeAudio,
-  fetchYoutubeResolutions
+  fetchYoutubeResolutions,
+  fetchYoutubeAudioQualities
 } from "@/services/api"
 
 // Componentes
@@ -20,106 +21,111 @@ import { About } from "@/components/About"
 
 export const PLATFORMS = {
   youtube: {
-    name: "YouTube",
-    color: "text-red-600",
-    bgGlow: "from-red-200/50",
-    button: "bg-red-600",
-    icon: <Play size={40} className="text-red-600" />,
-    endpoint: "/youtube",
-    regex: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|youtube\.com\/shorts\/)\/.+$/
+    name: "YouTube", color: "text-red-600", bgGlow: "from-red-200/50", button: "bg-red-600", endpoint: "/youtube",
+    regex: /(youtube\.com|youtu\.be)/
   },
   tiktok: {
-    name: "TikTok",
-    color: "text-zinc-900",
-    bgGlow: "from-cyan-200/40 via-pink-200/40",
-    button: "bg-zinc-900",
-    icon: <Music2 size={40} className="text-zinc-900" />,
-    endpoint: "/tiktok",
-    regex: /^(https?:\/\/)?(www\.)?tiktok\.com\/.+$/
+    name: "TikTok", color: "text-zinc-900", bgGlow: "from-cyan-200/40 via-pink-200/40", button: "bg-zinc-900", endpoint: "/tiktok",
+    regex: /tiktok\.com/
   }
 }
 
 const QUALITY_LABELS: Record<string, string> = {
-  "2160": "4K Ultra HD", "1440": "2K Quad HD", "1080": "Full HD",
-  "720": "HD", "480": "SD", "360": "Basic", "240": "Mobile", "144": "Data Saver"
+  "2160": "4K Ultra HD", "1440": "2K Quad HD", "1080": "Full HD", "720": "HD", "480": "SD", "360": "Basic", "240": "Mobile", "144": "Data Saver"
 };
 
 export default function Home() {
-  // --- ESTADOS ---
   const [activeTab, setActiveTab] = useState<keyof typeof PLATFORMS>("youtube")
   const [url, setUrl] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [view, setView] = useState<"options" | "resolutions" | "audio">("options")
+  const [isVertical, setIsVertical] = useState(false)
+  const [showAnalysis, setShowAnalysis] = useState(false)
+
+  // Estados de Loading
+  const [loadingBase, setLoadingBase] = useState(false)
   const [loadingRes, setLoadingRes] = useState(false)
+  const [loadingAudio, setLoadingAudio] = useState(false)
+
+  // Estados de Dados
   const [videoData, setVideoData] = useState<any>(null)
   const [resolutionsData, setResolutionsData] = useState<any>(null)
-  const [error, setError] = useState("")
-  const [showAnalysis, setShowAnalysis] = useState(false)
-  const [isVertical, setIsVertical] = useState(false)
-  const [view, setView] = useState<"options" | "resolutions" | "audio">("options")
+  const [audioQualitiesData, setAudioQualitiesData] = useState<any>(null)
 
-  // Seleção e Download
-  const [selectedRes, setSelectedRes] = useState("1080")
-  const [selectedBitrate, setSelectedBitrate] = useState("320")
+  // Seleções
+  const [selectedRes, setSelectedRes] = useState("")
+  const [selectedBitrate, setSelectedBitrate] = useState("")
   const [isDownloading, setIsDownloading] = useState(false)
   const [isDownloadingAudio, setIsDownloadingAudio] = useState(false)
 
   const current = PLATFORMS[activeTab]
 
-  // Mapeamento dinâmico das resoluções vindo do Pedro
-  const dynamicResolutions = resolutionsData
-    ? Object.entries(resolutionsData).map(([resKey, size]: any) => {
-      const cleanLabel = resKey.replace("tamanho_", "").replace("p", "");
-      return {
-        label: cleanLabel,
-        size: size,
-        quality: QUALITY_LABELS[cleanLabel] || "Qualidade Padrão"
-      }
-    }).sort((a, b) => parseInt(b.label) - parseInt(a.label))
-    : [];
+  // Mapeamentos dinâmicos
+  const dynamicResolutions = resolutionsData ? Object.entries(resolutionsData).map(([resKey, size]: any) => {
+    const cleanLabel = resKey.replace("tamanho_", "").replace("p", "");
+    return { label: cleanLabel, size: size, quality: QUALITY_LABELS[cleanLabel] || "Qualidade Padrão" }
+  }).sort((a, b) => parseInt(b.label) - parseInt(a.label)) : [];
 
+  const dynamicAudioResolutions = audioQualitiesData ? Object.entries(audioQualitiesData).map(([resKey, size]: any) => {
+    const cleanLabel = resKey.replace("tamanho_", "").replace("qualidade_", "").replace("p", "");
+    return { label: cleanLabel, size: size, quality: parseInt(cleanLabel) >= 256 ? "Alta Fidelidade" : "MP3" }
+  }).sort((a, b) => parseInt(b.label) - parseInt(a.label)) : [];
+
+  // --- 1. CARREGAMENTO INICIAL ---
   useEffect(() => {
     const triggerAutoProcess = async () => {
       if (!url.trim()) { setError(""); return; }
-      if (!current.regex.test(url)) {
-        setError(`Formato inválido para ${current.name.toUpperCase()}`);
+      if (!current.regex.test(url.toLowerCase())) {
+        setError(`O link colado não parece ser do ${current.name}`);
         setVideoData(null);
         return;
       }
-
       setError("");
-      const isShorts = url.includes("/shorts/") || url.includes("tiktok.com");
-      setIsVertical(isShorts);
-      setLoading(true);
-      setResolutionsData(null);
+      setIsVertical(url.includes("/shorts/") || url.includes("tiktok.com"));
+      setLoadingBase(true);
+      setVideoData(null); setResolutionsData(null); setAudioQualitiesData(null);
 
       try {
-        // 1. Busca Info Básica
         const info = await sendLinkToBackend(url, current.endpoint);
         setVideoData(info);
         setView("options");
-        setLoading(false);
-
-        // 2. Busca Resoluções em Background
-        setLoadingRes(true);
-        const resInfo = await fetchYoutubeResolutions(url);
-        setResolutionsData(resInfo);
-
-        if (resInfo) {
-          const keys = Object.keys(resInfo).map(k => k.replace("tamanho_", "").replace("p", ""));
-          const sorted = keys.sort((a, b) => parseInt(b) - parseInt(a));
-          setSelectedRes(sorted[0]);
-        }
       } catch (err) {
-        setError("Erro na conexão com o servidor.");
+        setError("Não conseguimos identificar este vídeo.");
       } finally {
-        setLoading(false);
-        setLoadingRes(false);
+        setLoadingBase(false);
       }
     };
-    triggerAutoProcess();
+    const timeoutId = setTimeout(triggerAutoProcess, 500);
+    return () => clearTimeout(timeoutId);
   }, [url, activeTab]);
 
-  // Handler MP4
+  // --- 2. CARREGAR MP4 ---
+  const handleLoadResolutions = async () => {
+    if (resolutionsData) { setView("resolutions"); return; }
+    setLoadingRes(true);
+    try {
+      const data = await fetchYoutubeResolutions(url);
+      setResolutionsData(data);
+      const keys = Object.keys(data).map(k => k.replace("tamanho_", "").replace("p", ""));
+      setSelectedRes(keys.sort((a, b) => parseInt(b) - parseInt(a))[0]);
+      setView("resolutions");
+    } catch (err) { alert("Erro ao buscar resoluções."); } finally { setLoadingRes(false); }
+  };
+
+  // --- 3. CARREGAR MP3 ---
+  const handleLoadAudio = async () => {
+    if (audioQualitiesData) { setView("audio"); return; }
+    setLoadingAudio(true);
+    try {
+      const data = await fetchYoutubeAudioQualities(url);
+      setAudioQualitiesData(data);
+      const keys = Object.keys(data).map(k => k.replace("tamanho_", "").replace("qualidade_", ""));
+      setSelectedBitrate(keys.sort((a, b) => parseInt(b) - parseInt(a))[0]);
+      setView("audio");
+    } catch (err) { alert("Erro ao buscar qualidades de áudio."); } finally { setLoadingAudio(false); }
+  };
+
+  // --- DOWNLOAD MP4 (COM NOME DO VÍDEO + QUALIDADE) ---
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
@@ -127,42 +133,41 @@ export default function Home() {
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
-      const cleanTitle = videoData.titulo ? videoData.titulo.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'video';
+
+      // LÓGICA DO NOME: Título limpo + Resolução
+      const cleanTitle = videoData?.titulo ? videoData.titulo.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'video';
       link.setAttribute('download', `${cleanTitle}_${selectedRes}p.mp4`);
+
       document.body.appendChild(link);
       link.click();
       link.parentNode?.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
-    } catch (err) { alert("Erro ao processar download."); } finally { setIsDownloading(false); }
+    } catch (err) { alert("Erro no download."); } finally { setIsDownloading(false); }
   };
 
+  // --- DOWNLOAD MP3 (COM NOME DO VÍDEO + BITRATE) ---
   const handleAudioDownload = async () => {
     setIsDownloadingAudio(true);
     try {
-      // Chamando a função do api.ts e passando o valor (ex: "320", "192", "128")
       const blob = await downloadYoutubeAudio(url, selectedBitrate);
-
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
 
-      const cleanTitle = videoData.titulo ? videoData.titulo.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'audio';
-      link.setAttribute('download', `${cleanTitle}.mp3`);
+      // LÓGICA DO NOME: Título limpo + kbps
+      const cleanTitle = videoData?.titulo ? videoData.titulo.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'audio';
+      link.setAttribute('download', `${cleanTitle}_${selectedBitrate}kbps.mp3`);
 
       document.body.appendChild(link);
       link.click();
       link.parentNode?.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
-    } catch (err) {
-      alert("Erro ao baixar áudio.");
-    } finally {
-      setIsDownloadingAudio(false);
-    }
+    } catch (err) { alert("Erro no áudio."); } finally { setIsDownloadingAudio(false); }
   };
 
   const resetAll = () => {
-    setVideoData(null); setResolutionsData(null); setUrl(""); setError("");
-    setView("options"); setShowAnalysis(false); setIsDownloadingAudio(false);
+    setVideoData(null); setResolutionsData(null); setAudioQualitiesData(null);
+    setUrl(""); setError(""); setView("options");
   };
 
   const scrollToSection = (id: string) => {
@@ -171,44 +176,30 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen relative overflow-x-hidden bg-zinc-100 flex flex-col items-center transition-colors duration-700">
+    <main className="min-h-screen relative overflow-x-hidden bg-white flex flex-col items-center transition-colors duration-700">
       <div className={`absolute inset-0 bg-gradient-to-b ${current.bgGlow} to-white -z-10 transition-all duration-700`} />
-
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} onReset={resetAll} onScroll={scrollToSection} />
-
       <div className="max-w-4xl w-full flex flex-col items-center justify-center pt-4 px-4 z-10 text-center min-h-[80vh]">
         <AnimatePresence mode="wait">
           {!videoData ? (
-            <Hero current={current} url={url} setUrl={setUrl} loading={loading} error={error} onScrollToFeatures={() => scrollToSection('features')} />
+            <Hero current={current} url={url} setUrl={setUrl} loading={loadingBase} error={error} onScrollToFeatures={() => scrollToSection('features')} />
           ) : (
             <ResultCard
-              videoData={videoData}
-              isVertical={isVertical}
-              view={view}
-              setView={setView}
-
-              // Props Vídeo
-              selectedRes={selectedRes}
-              setSelectedRes={setSelectedRes}
-              isDownloading={isDownloading}
-              onDownload={handleDownload}
+              videoData={videoData} isVertical={isVertical} view={view} setView={setView}
+              selectedRes={selectedRes} setSelectedRes={setSelectedRes}
+              isDownloading={isDownloading} onDownload={handleDownload}
               resolutions={dynamicResolutions}
-              loadingRes={loadingRes}
-
-              selectedBitrate={selectedBitrate}
-              setSelectedBitrate={setSelectedBitrate}
-              isDownloadingAudio={isDownloadingAudio}
-              onAudioDownload={handleAudioDownload}
-
-              showAnalysis={showAnalysis}
-              setShowAnalysis={setShowAnalysis}
-              onReset={resetAll}
-              current={current}
+              selectedBitrate={selectedBitrate} setSelectedBitrate={setSelectedBitrate}
+              isDownloadingAudio={isDownloadingAudio} onAudioDownload={handleAudioDownload}
+              audioResolutions={dynamicAudioResolutions}
+              loadingRes={loadingRes} loadingAudio={loadingAudio}
+              onLoadResolutions={handleLoadResolutions} onLoadAudio={handleLoadAudio}
+              showAnalysis={showAnalysis} setShowAnalysis={setShowAnalysis}
+              onReset={resetAll} current={current}
             />
           )}
         </AnimatePresence>
       </div>
-
       {!videoData && <Features />}
       <About />
     </main>

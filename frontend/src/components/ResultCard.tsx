@@ -15,7 +15,7 @@ export function ResultCard({
 }: any) {
   return (
     <div className="flex flex-col items-center w-full max-w-lg mb-10">
-      { }
+      
       <div className={`bg-zinc-200 rounded-[3rem] mb-6 overflow-hidden border-[6px] border-white shadow-2xl relative transition-all duration-500 ${isVertical ? 'w-52 aspect-[9/16]' : 'w-full aspect-video md:w-[32rem]'}`}>
         {videoData.thumbnail ? (
           <img src={videoData.thumbnail} className="w-full h-full object-cover" alt="Thumbnail" />
@@ -31,7 +31,6 @@ export function ResultCard({
         )}
       </div>
 
-      { }
       <AnimatePresence mode="wait">
         {view === "options" && (
           <OptionsView
@@ -57,6 +56,10 @@ export function ResultCard({
           <AudioView
             key="audio"
             setView={setView}
+            
+            // --- ESTA LINHA ABAIXO É A CORREÇÃO ---
+            audioResolutions={props.audioResolutions} 
+            
             selectedBitrate={props.selectedBitrate}
             setSelectedBitrate={props.setSelectedBitrate}
             onDownload={props.onAudioDownload}
@@ -66,7 +69,6 @@ export function ResultCard({
         )}
       </AnimatePresence>
 
-      { }
       <AnimatePresence>
         {props.showAnalysis && view === "options" && (
           <motion.div
@@ -85,7 +87,6 @@ export function ResultCard({
         )}
       </AnimatePresence>
 
-      { }
       <button
         onClick={onReset}
         className="mt-12 text-zinc-300 hover:text-zinc-900 font-black text-[10px] uppercase tracking-[0.3em] transition-colors mb-10"

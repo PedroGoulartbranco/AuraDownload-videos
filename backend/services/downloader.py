@@ -75,6 +75,23 @@ def mandar_tamanho_resolucoes(url):
                     tamanho = round(tamanho + audio_estimado_mb, 2)
                     tamanhos_por_resolucao[f"tamanho_{altura}"] = tamanho
     return tamanhos_por_resolucao
+
+def mandar_audio_qualidade(url):
+    opcoes = {
+        'quiet': True,      
+        'no_warnings': True,
+        'format': 'best',       
+    }
+    lista_audios = {}
+    with yt_dlp.YoutubeDL(opcoes) as ydl:
+        informacoes = ydl.extract_info(url, download=False)
+        for formato in informacoes.get('formats'):
+            if formato.get('vcodec') == 'none': #Pega só os audios sem imagem
+                abr = formato.get('abr')
+                if abr:
+                    abr = int(abr)
+                    lista_audios[f"qualidade_{abr}": {abr}]
+    return lista_audios
     
 def excluir_video(caminho):
     if os.path.exists:

@@ -70,3 +70,9 @@ async def youtube_mandar_tamanho(requisicao: VideoRequest):
      link_recebido = requisicao.url
      tamanhos = mandar_tamanho_resolucoes(link_recebido)
      return  tamanhos
+
+@router.post("/youtube_audio_qualidade")
+async def youtube_audio_mandar_qualidade(requisicao: VideoRequest):
+     link_recebido = requisicao.url
+     qualidades = mandar_audio_qualidade(link_recebido)
+     return qualidades      

@@ -76,7 +76,7 @@ def mandar_tamanho_resolucoes(url):
                     tamanhos_por_resolucao[f"tamanho_{altura}"] = tamanho
     return tamanhos_por_resolucao
 
-def mandar_audio_qualidade(url):
+def youtube_mandar_audio_tamanho(url):
     opcoes = {
         'quiet': True,      
         'no_warnings': True,
@@ -85,12 +85,13 @@ def mandar_audio_qualidade(url):
     lista_audios = {}
     with yt_dlp.YoutubeDL(opcoes) as ydl:
         informacoes = ydl.extract_info(url, download=False)
-        for formato in informacoes.get('formats'):
-            if formato.get('vcodec') == 'none': #Pega só os audios sem imagem
-                abr = formato.get('abr')
-                if abr:
-                    abr = int(abr)
-                    lista_audios[f"qualidade_{abr}": {abr}]
+        duracao_video = informacoes.get('duration', 0)
+        lista_qualidade_audio = [96, 128, 256, 320]
+        for qualidade in lista_qualidade_audio:
+            tamanho_audio = (qualidade * duracao_video) / (8 * 1024)
+            tamanho_audio = round(tamanho_audio, 2)
+            lista_audios[f"tamanho_{qualidade}"] = tamanho_audio
+    print(lista_audios)
     return lista_audios
     
 def excluir_video(caminho):
@@ -100,7 +101,12 @@ def excluir_video(caminho):
 def youtube_baixar_audio(url, qualidade):
     os.makedirs(PASTA_DOWNLOADS, exist_ok=True) #Se a pasta nao existir ele cria
     opcoes = {
-    'format': f'bestaudio[abr<={qualidade}]/bestaudio',
+    'format': 'bestaudio/best', # Pega o melhor que o YouTube tem (ex: 160kbps)
+    'postprocessors': [{
+    'key': 'FFmpegExtractAudio',
+    'preferredcodec': 'mp3',
+    'preferredquality': str(qualidade), # O FFmpeg transforma a qualidade aqui
+    }],
     
     'outtmpl': os.path.join(PASTA_DOWNLOADS, '%(title)s.%(ext)s'),
     

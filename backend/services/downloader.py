@@ -2,6 +2,7 @@ import yt_dlp
 import os
 import bleach
 
+#Caminhos Absolutos para Não dar erro
 PASTA_ATUAL = os.path.dirname(os.path.abspath(__file__))
 PASTA_BACKEND = os.path.abspath(os.path.join(PASTA_ATUAL, ".."))
 PASTA_DOWNLOADS = os.path.join(PASTA_BACKEND, "downloads")

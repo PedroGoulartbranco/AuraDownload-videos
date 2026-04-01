@@ -178,16 +178,46 @@ def tiktok_informacoes_video(url):
     
 def tiktok_baixar_videos(url):
     os.makedirs(PASTA_DOWNLOADS, exist_ok=True) #Se a pasta nao existir ele cria
+
     opcoes = {
-        'format': 'b',
+        'format': 'best', # Só baixa o melhor que tiver
         'outtmpl': os.path.join(PASTA_DOWNLOADS, '%(title)s.%(ext)s'),
+        'ffmpeg_location': CAMINHO_FFMPEG,
+        'restrictfilenames': True,
         'quiet': True,
-        'no_warnings': True,
+        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
     }
     with yt_dlp.YoutubeDL(opcoes) as ydl:
             info = ydl.extract_info(url, download=True)
             return ydl.prepare_filename(info)
     
+def tiktok_baixar_audio(url):
+    os.makedirs(PASTA_DOWNLOADS, exist_ok=True) #Se a pasta nao existir ele cria
+    opcoes = {
+        'format': 'bestaudio/best',  
+        'outtmpl': os.path.join(PASTA_DOWNLOADS, '%(title)s.%(ext)s'),
+        'quiet': True,
+        'no_warnings': True,
+        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36', 
+        
+        'ffmpeg_location': CAMINHO_FFMPEG, 
+        'restrictfilenames': True, # Limpa emojis e espaços do nome do arquivo
+        
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',      
+            'preferredquality': '192',    
+        }],
+    }
+    try:
+        with yt_dlp.YoutubeDL(opcoes) as ydl:
+            informacoes = ydl.extract_info(url, download=True)
+            caminho_final = ydl.prepare_filename(informacoes)
+            caminho_final = os.path.splitext(caminho_final)[0] + ".mp3"
+            return caminho_final
+    except Exception as e:
+        return None
+
 def verificar_link_tiktok(url):
     link_limpado = limpar_link_contra_scripts(url)
     opcoes = {

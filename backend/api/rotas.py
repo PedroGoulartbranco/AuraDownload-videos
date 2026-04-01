@@ -135,4 +135,49 @@ async def youtube_audio_mandar_tamanho(requisicao: VideoRequest):
             status_code=400, 
             detail="Link inválido, malicioso ou playlist não suportada."
         )
-#@router.pos("")
+@router.post("/tiktok")
+async def tiktok_ver_informacoes(requisicao: VideoRequest):
+    link_recebido = requisicao.url
+    link_seguro, link_recebido = verificar_link_tiktok(link_recebido)
+    if link_seguro:
+        try:
+            informacoes_video_tiktok = tiktok_informacoes_video(link_recebido)
+            return informacoes_video_tiktok
+        except:
+            raise HTTPException(
+            status_code=400, 
+            detail="Erro na busca de informações no vídeo"
+            )
+    else:
+        raise HTTPException(
+            status_code=400, 
+            detail="Link inválido ou malicioso."
+        )
+
+@router.post("/baixar_video_tiktok")
+@limiter.limit("3/minute")
+async def tiktok_baixar_video_rota(requisicao: VideoRequest, background_tasks: BackgroundTasks, request: Request):
+    if download_limite._value == 0: #== 0 significa que tem 0 vagas na fila
+        raise HTTPException(status_code=503, detail="Servidor lotado! Tente em 1 minuto.")
+    async with download_limite:
+        link_recebido = requisicao.url
+        link_seguro, link_recebido = verificar_link_tiktok(link_recebido)
+        if link_seguro:
+            try:
+                caminho_video = tiktok_baixar_videos(link_recebido)
+                background_tasks.add_task(excluir_video,caminho_video) #Não pode colocar () na função porque se nao executa na hora
+                return FileResponse(
+                    path=caminho_video, 
+                    filename=os.path.basename(caminho_video), # Pega só o nome do arquivo
+                    media_type='video/mp4'
+                )
+            except:
+                raise HTTPException(
+                status_code=400, 
+                detail="Erro no download."
+                )
+        else:
+            raise HTTPException(
+            status_code=400, 
+            detail="Link inválido ou malicioso."
+            )

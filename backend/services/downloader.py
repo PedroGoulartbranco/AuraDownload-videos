@@ -27,9 +27,13 @@ def youtube_informacoes_video(url):
             "resolucao": informacoes.get("resolution"),
             "thumbnail": informacoes.get("thumbnail"),
         }
+
+def limpar_link_contra_scripts(url):
+    url_limpa = bleach.clean(url, tags=[], attributes={}, strip=True) #Faz alimpeza
+    return url_limpa
     
 def verificar_link_youtube(url):
-    url_limpa = bleach.clean(url, tags=[], attributes={}, strip=True) #Faz alimpeza
+    url_limpa = limpar_link_contra_scripts(url)
     url_somente_video  = url_limpa.split('&')[0]
     opcoes = {
             'quiet': True,
@@ -152,3 +156,50 @@ def youtube_baixar_audio(url, qualidade):
             return caminho_final
     except Exception as e:
         return None
+    
+def tiktok_informacoes_video(url):
+    opcoes = {
+        'quiet': True,
+        'no_warnings': True,
+        'extract_flat': False, 
+    }
+    with yt_dlp.YoutubeDL(opcoes) as ydl:
+        informacoes = ydl.extract_info(url, download=False)
+        return {
+            "titulo": informacoes.get('title') or informacoes.get('description'),
+            "thumb": informacoes.get('thumbnail'),
+            "views": informacoes.get('view_count'),
+            "likes": informacoes.get('like_count'),
+            "autor": informacoes.get('uploader') or informacoes.get('uploader_id'),
+            "duracao": informacoes.get('duration'),
+            "altura": informacoes.get('height'),
+            "largura": informacoes.get('width')
+        }
+    
+def tiktok_baixar_videos(url):
+    os.makedirs(PASTA_DOWNLOADS, exist_ok=True) #Se a pasta nao existir ele cria
+    opcoes = {
+        'format': 'b',
+        'outtmpl': os.path.join(PASTA_DOWNLOADS, '%(title)s.%(ext)s'),
+        'quiet': True,
+        'no_warnings': True,
+    }
+    with yt_dlp.YoutubeDL(opcoes) as ydl:
+            info = ydl.extract_info(url, download=True)
+            return ydl.prepare_filename(info)
+    
+def verificar_link_tiktok(url):
+    link_limpado = limpar_link_contra_scripts(url)
+    opcoes = {
+        'quiet': True,
+        'no_warnings': True,
+        'extract_flat': False, 
+    }
+    try:
+        with yt_dlp.YoutubeDL(opcoes) as ydl:
+            informacoes = ydl.extract_info(url, download=False)
+            if not informacoes:
+                return False, link_limpado
+            return True, link_limpado
+    except:
+        return False, link_limpado

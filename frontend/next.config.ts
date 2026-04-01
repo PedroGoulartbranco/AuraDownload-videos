@@ -1,9 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  devIndicators: {
-    appIsrStatus: false, // Esconde o indicador de ISR
-    buildActivity: false, // Esconde o ícone de carregamento/build
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '**.tiktokcdn.com' },
+      { protocol: 'https', hostname: '**.tiktok.com' },
+      { protocol: 'https', hostname: '**.ytimg.com' },
+    ],
   },
 };
-
 export default nextConfig;

@@ -3,7 +3,6 @@ import { useState, useEffect } from "react"
 import { AnimatePresence } from "framer-motion"
 import { Play, Music2 } from "lucide-react"
 
-// Chamadas de API
 import {
   sendLinkToBackend,
   downloadYoutubeVideo,
@@ -12,7 +11,6 @@ import {
   fetchYoutubeAudioQualities
 } from "@/services/api"
 
-// Componentes
 import { Navbar } from "@/components/Navbar"
 import { Hero } from "@/components/Hero"
 import { ResultCard } from "@/components/ResultCard"
@@ -42,17 +40,14 @@ export default function Home() {
   const [isVertical, setIsVertical] = useState(false)
   const [showAnalysis, setShowAnalysis] = useState(false)
 
-  // Estados de Loading
   const [loadingBase, setLoadingBase] = useState(false)
   const [loadingRes, setLoadingRes] = useState(false)
   const [loadingAudio, setLoadingAudio] = useState(false)
 
-  // Estados de Dados
   const [videoData, setVideoData] = useState<any>(null)
   const [resolutionsData, setResolutionsData] = useState<any>(null)
   const [audioQualitiesData, setAudioQualitiesData] = useState<any>(null)
 
-  // Seleções
   const [selectedRes, setSelectedRes] = useState("")
   const [selectedBitrate, setSelectedBitrate] = useState("")
   const [isDownloading, setIsDownloading] = useState(false)
@@ -60,7 +55,6 @@ export default function Home() {
 
   const current = PLATFORMS[activeTab]
 
-  // Mapeamentos dinâmicos
   const dynamicResolutions = resolutionsData ? Object.entries(resolutionsData).map(([resKey, size]: any) => {
     const cleanLabel = resKey.replace("tamanho_", "").replace("p", "");
     return { label: cleanLabel, size: size, quality: QUALITY_LABELS[cleanLabel] || "Qualidade Padrão" }
@@ -71,7 +65,6 @@ export default function Home() {
     return { label: cleanLabel, size: size, quality: parseInt(cleanLabel) >= 256 ? "Alta Fidelidade" : "MP3" }
   }).sort((a, b) => parseInt(b.label) - parseInt(a.label)) : [];
 
-  // --- 1. CARREGAMENTO INICIAL ---
   useEffect(() => {
     const triggerAutoProcess = async () => {
       if (!url.trim()) { setError(""); return; }
@@ -90,7 +83,7 @@ export default function Home() {
         setVideoData(info);
         setView("options");
       } catch (err) {
-        setError("Não conseguimos identificar este vídeo.");
+        setError("Não conseguimos identificar este vídeo ou o formato é inválido.");
       } finally {
         setLoadingBase(false);
       }
@@ -99,7 +92,6 @@ export default function Home() {
     return () => clearTimeout(timeoutId);
   }, [url, activeTab]);
 
-  // --- 2. CARREGAR MP4 ---
   const handleLoadResolutions = async () => {
     if (resolutionsData) { setView("resolutions"); return; }
     setLoadingRes(true);
@@ -112,7 +104,6 @@ export default function Home() {
     } catch (err) { alert("Erro ao buscar resoluções."); } finally { setLoadingRes(false); }
   };
 
-  // --- 3. CARREGAR MP3 ---
   const handleLoadAudio = async () => {
     if (audioQualitiesData) { setView("audio"); return; }
     setLoadingAudio(true);
@@ -125,7 +116,6 @@ export default function Home() {
     } catch (err) { alert("Erro ao buscar qualidades de áudio."); } finally { setLoadingAudio(false); }
   };
 
-  // --- DOWNLOAD MP4 (COM NOME DO VÍDEO + QUALIDADE) ---
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
@@ -134,7 +124,6 @@ export default function Home() {
       const link = document.createElement('a');
       link.href = blobUrl;
 
-      // LÓGICA DO NOME: Título limpo + Resolução
       const cleanTitle = videoData?.titulo ? videoData.titulo.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'video';
       link.setAttribute('download', `${cleanTitle}_${selectedRes}p.mp4`);
 
@@ -145,7 +134,6 @@ export default function Home() {
     } catch (err) { alert("Erro no download."); } finally { setIsDownloading(false); }
   };
 
-  // --- DOWNLOAD MP3 (COM NOME DO VÍDEO + BITRATE) ---
   const handleAudioDownload = async () => {
     setIsDownloadingAudio(true);
     try {

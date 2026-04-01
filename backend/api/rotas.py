@@ -16,11 +16,19 @@ download_limite = asyncio.Semaphore(50) #Limita o servidor para ter no maximo 50
 @router.post("/youtube")
 async def Youtube_mandar_informacoes_video(requisicao: VideoRequest):
     link_recebido = requisicao.url
-    informacoes_video = youtube_informacoes_video(link_recebido)
-    return {
-        "status": "Ok",
-        "dados": informacoes_video
-    }
+    link_seguro, link_recebido = verificar_link_youtube(link_recebido)
+    print("------------", link_seguro)
+    if link_seguro:
+        informacoes_video = youtube_informacoes_video(link_recebido)
+        return {
+            "status": "Ok",
+            "dados": informacoes_video
+        }
+    else:
+        raise HTTPException(
+            status_code=400, 
+            detail="Link inválido, malicioso ou playlist não suportada."
+        )
 
 @router.post("/baixar_video_youtube")
 @limiter.limit("3/minute")
@@ -76,3 +84,5 @@ async def youtube_audio_mandar_tamanho(requisicao: VideoRequest):
      link_recebido = requisicao.url
      tamanhos = youtube_mandar_audio_tamanho(link_recebido)
      return tamanhos      
+
+#@router.pos("")

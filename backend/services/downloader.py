@@ -1,5 +1,6 @@
 import yt_dlp
 import os
+import bleach
 
 PASTA_ATUAL = os.path.dirname(os.path.abspath(__file__))
 PASTA_BACKEND = os.path.abspath(os.path.join(PASTA_ATUAL, ".."))
@@ -9,10 +10,9 @@ CAMINHO_FFMPEG = os.path.join(PASTA_BACKEND, "ffmpeg.exe")
 def youtube_informacoes_video(url):
     opcoes = {
         'quiet': True,           # Não enche o terminal de mensagens
-        'no_warnings': True,
-        'format': 'best',        # Simula que vai pegar o melhor formato
+        'no_warnings': True
     }
-
+    
     with yt_dlp.YoutubeDL(opcoes) as ydl:
         informacoes = ydl.extract_info(url, download=False)
         # tamanho = informacoes.get('filesize') or informacoes.get('filesize_approx') or 0
@@ -26,6 +26,28 @@ def youtube_informacoes_video(url):
             "resolucao": informacoes.get("resolution"),
             "thumbnail": informacoes.get("thumbnail"),
         }
+    
+def verificar_link_youtube(url):
+    url_limpa = bleach.clean(url, tags=[], attributes={}, strip=True) #Faz alimpeza
+    url_somente_video  = url_limpa.split('&')[0]
+    opcoes = {
+            'quiet': True,
+            'no_warnings': True,
+            'extract_flat': True, 
+            'playlist_items': '1', 
+            'noplaylist': True,    
+        }
+    try:
+        with yt_dlp.YoutubeDL(opcoes) as ydl:
+            informacoes = ydl.extract_info(url_somente_video, download=False)
+            if not informacoes:
+                return False, url_somente_video
+            tipo = informacoes.get('_type', 'video')
+            if tipo == "video":
+                return True, url_somente_video
+            return False, url_somente_video
+    except:
+        return False, url_somente_video
     
 def youtube_baixar_videos(url, qualidade):
     os.makedirs(PASTA_DOWNLOADS, exist_ok=True) #Se a pasta nao existir ele cria

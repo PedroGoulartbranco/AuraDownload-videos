@@ -2,93 +2,72 @@
 const BACKEND_URL = "http://26.44.44.119:8000";
 
 export async function sendLinkToBackend(url: string, endpoint: string) {
-  try {
-    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: url }),
-    });
-
-    if (!response.ok) throw new Error("Erro na resposta do servidor");
-
-    const data = await response.json();
-
-    return data.dados ? data.dados : data;
-  } catch (error) {
-    console.error("Erro na chamada API (Info):", error);
-    throw error;
-  }
+  const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url: url }),
+  });
+  if (!response.ok) throw new Error("Erro na resposta do servidor");
+  const data = await response.json();
+  return data.dados ? data.dados : data;
 }
 
 export async function fetchYoutubeResolutions(url: string) {
-  try {
-    const response = await fetch(`${BACKEND_URL}/youtube_tamanho_qualidade`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: url }),
-    });
-
-    if (!response.ok) throw new Error("Erro ao buscar resoluções do vídeo");
-
-    const data = await response.json();
-
-    return data.dados ? data.dados : data;
-  } catch (error) {
-    console.error("Erro na chamada API (Resoluções):", error);
-    throw error;
-  }
-}
-
-export async function downloadYoutubeVideo(url: string, resolution: string) {
-  try {
-    const response = await fetch(`${BACKEND_URL}/baixar_video_youtube`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        url: url,
-        resolution: resolution.replace("p", "")
-      }),
-    });
-
-    if (!response.ok) throw new Error("Erro ao baixar o vídeo do servidor");
-
-    return await response.blob();
-  } catch (error) {
-    console.error("Erro no download de vídeo:", error);
-    throw error;
-  }
+  const response = await fetch(`${BACKEND_URL}/youtube_tamanho_qualidade`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url: url }),
+  });
+  const data = await response.json();
+  return data.dados ? data.dados : data;
 }
 
 export async function fetchYoutubeAudioQualities(url: string) {
-  try {
-    const response = await fetch(`${BACKEND_URL}/youtube_audio_tamanho`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: url }),
-    });
-    if (!response.ok) throw new Error("Erro ao buscar qualidades de áudio");
-    const data = await response.json();
-    return data.dados ? data.dados : data;
-  } catch (error) {
-    console.error("Erro API Áudio:", error);
-    throw error;
-  }
+  const response = await fetch(`${BACKEND_URL}/youtube_audio_qualidade`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url: url }),
+  });
+  const data = await response.json();
+  return data.dados ? data.dados : data;
 }
 
-export async function downloadYoutubeAudio(url: string, quality: string) {
-  try {
-    const response = await fetch(`${BACKEND_URL}/baixar_audio_youtube`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        url: url,
-        quality_audio: quality  
-      }),
-    });
-    if (!response.ok) throw new Error("Erro no download de áudio");
-    return await response.blob();
-  } catch (error) {
-    console.error("Erro no download de áudio:", error);
-    throw error;
-  }
+// DOWNLOAD VÍDEO (AJUSTADO PARA TIKTOK)
+export async function downloadVideo(url: string, res: string, platform: string) {
+  const isYoutube = platform === 'youtube';
+  const endpoint = isYoutube ? '/baixar_video_youtube' : '/baixar_video_tiktok';
+  
+  // Criamos o body dinamicamente
+  const bodyData = isYoutube 
+    ? { url, resolution: res.replace("p", "") } // YouTube envia link + resolução
+    : { url };                                  // TikTok envia APENAS o link
+
+  const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(bodyData),
+  });
+
+  if (!response.ok) throw new Error("Erro no download do vídeo");
+  return await response.blob();
+}
+
+// DOWNLOAD ÁUDIO (AJUSTADO PARA TIKTOK)
+export async function downloadAudio(url: string, quality: string, platform: string) {
+  const isYoutube = platform === 'youtube';
+  const endpoint = isYoutube ? '/baixar_audio_youtube' : '/baixar_audio_tiktok';
+
+  // Criamos o body dinamicamente
+  const bodyData = isYoutube 
+    ? { url, quality_audio: quality }
+    : { url };                       
+
+  const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(bodyData),
+  });
+
+  if (!response.ok) throw new Error("Erro no download do áudio");
+  return await response.blob();
 }

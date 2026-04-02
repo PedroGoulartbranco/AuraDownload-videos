@@ -235,6 +235,7 @@ def tiktok_baixar_audio(url):
             informacoes = ydl.extract_info(url, download=True)
             caminho_final = ydl.prepare_filename(informacoes)
             caminho_final = os.path.splitext(caminho_final)[0] + ".mp3"
+            print(caminho_final)
             return caminho_final
     except Exception as e:
         return None

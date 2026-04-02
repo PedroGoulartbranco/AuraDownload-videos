@@ -159,7 +159,6 @@ async def tiktok_baixar_video_rota(requisicao: VideoRequest, background_tasks: B
             try:
                 caminho_video = tiktok_baixar_videos(link_recebido)
                 background_tasks.add_task(excluir_video,caminho_video) #Não pode colocar () na função porque se nao executa na hora
-                print(link_recebido)
                 return FileResponse(
                     path=caminho_video, 
                     filename=os.path.basename(caminho_video), # Pega só o nome do arquivo
@@ -185,4 +184,21 @@ async def tiktok_baixar_audio_rota(requisicao: VideoRequest, background_tasks: B
         link_recebido = requisicao.url
         link_seguro, link_recebido = verificar_link_tiktok(link_recebido)
         if link_seguro:
-            caminho_audio = tiktok_baixar_audio(link_recebido)
+            try:
+                caminho_audio = tiktok_baixar_audio(link_recebido)
+                background_tasks.add_task(excluir_video,caminho_audio)
+                return FileResponse(
+                    path=caminho_audio, 
+                    filename=os.path.basename(caminho_audio), # Pega só o nome do arquivo
+                    media_type='audio/mpeg'
+                )
+            except:
+                raise HTTPException(
+                status_code=400, 
+                detail="Erro no download."
+                )
+        else:
+            raise HTTPException(
+            status_code=400, 
+            detail="Link inválido ou malicioso."
+            )

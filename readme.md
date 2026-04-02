@@ -69,13 +69,29 @@ npm install
 npm run dev
 The application will be available at http://localhost:3000.
 ```
-🔒 Security Highlights
-FluxMedia is fortified against common web vulnerabilities:
-XSS Protection: All user inputs and URLs are strictly sanitized before reaching the extraction logic.
-Iframe Protection: Middleware injections of X-Frame-Options: DENY prevent Clickjacking attacks.
-Codec Standardization: The backend forces conversion to H.264 (AVC) to ensure maximum compatibility and avoid "black screen" errors on common players.
-👨‍💻 Authors
+---
+
+## 🔒 Security Highlights
+
+FluxMedia is fortified against common web vulnerabilities using industry-standard practices:
+
+* **XSS Protection:** All user inputs and URLs are strictly sanitized using `bleach` before reaching the extraction logic.
+* **Iframe Protection:** Middleware injections of `X-Frame-Options: DENY` and `Content-Security-Policy` prevent Clickjacking attacks.
+* **Codec Standardization:** The backend forces conversion to **H.264 (AVC)** and **AAC** to ensure maximum compatibility and avoid "black screen" errors on modern players.
+
+---
+
+## 👨‍💻 Authors
+
 This project was engineered and developed by:
-Vitor Rovani Marcelino - Lead Frontend & UX/UI Designer - GitHub
-Pedro Goulart Branco - Lead Backend & Systems Architect - GitHub
-<p align="center">FluxMedia © 2026 - Intelligent Systems</p>
+
+| Name | Role | Profile |
+| :--- | :--- | :--- |
+| **Vitor Rovani Marcelino** | Lead Frontend & UX/UI Designer | [GitHub](https://github.com/vitor-rovani) |
+| **Pedro Goulart Branco** | Lead Backend & Systems Architect | [GitHub](https://github.com/PedroGoulartbranco) |
+
+---
+
+<p align="center">
+  <b>FluxMedia © 2026 - Intelligent Systems</b>
+</p>

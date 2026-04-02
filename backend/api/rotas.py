@@ -127,8 +127,8 @@ async def youtube_audio_mandar_tamanho(requisicao: VideoRequest):
             return tamanhos
         except:
             raise HTTPException(
-            status_code=400, 
-            detail="Erro nos tamanhos do arquivo"
+                status_code=400, 
+                detail="Erro nos tamanhos do arquivo"
             ) 
     else:
         raise HTTPException(
@@ -143,8 +143,8 @@ async def tiktok_ver_informacoes(requisicao: VideoRequest):
         return informacoes_video_tiktok
     except:
         raise HTTPException(
-        status_code=400, 
-        detail="Erro na busca de informações no vídeo"
+            status_code=400, 
+            detail="Erro na busca de informações no vídeo"
         )
 
 @router.post("/baixar_video_tiktok")
@@ -166,13 +166,13 @@ async def tiktok_baixar_video_rota(requisicao: VideoRequest, background_tasks: B
                 )
             except:
                 raise HTTPException(
-                status_code=400, 
-                detail="Erro no download."
+                    status_code=400, 
+                    detail="Erro no download."
                 )
         else:
             raise HTTPException(
-            status_code=400, 
-            detail="Link inválido ou malicioso."
+                status_code=400, 
+                detail="Link inválido ou malicioso."
             )
 
 @router.post("/baixar_audio_tiktok")
@@ -194,11 +194,11 @@ async def tiktok_baixar_audio_rota(requisicao: VideoRequest, background_tasks: B
                 )
             except:
                 raise HTTPException(
-                status_code=400, 
-                detail="Erro no download."
+                    status_code=400, 
+                    detail="Erro no download."
                 )
         else:
             raise HTTPException(
-            status_code=400, 
-            detail="Link inválido ou malicioso."
+                status_code=400, 
+                detail="Link inválido ou malicioso."
             )

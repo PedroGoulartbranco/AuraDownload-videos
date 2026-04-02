@@ -68,6 +68,7 @@ cd ../frontend
 npm install
 npm run dev
 The application will be available at http://localhost:3000.
+```
 🔒 Security Highlights
 FluxMedia is fortified against common web vulnerabilities:
 XSS Protection: All user inputs and URLs are strictly sanitized before reaching the extraction logic.

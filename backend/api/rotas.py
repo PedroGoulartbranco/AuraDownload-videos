@@ -138,20 +138,13 @@ async def youtube_audio_mandar_tamanho(requisicao: VideoRequest):
 @router.post("/tiktok")
 async def tiktok_ver_informacoes(requisicao: VideoRequest):
     link_recebido = requisicao.url
-    link_seguro, link_recebido = verificar_link_tiktok(link_recebido)
-    if link_seguro:
-        try:
-            informacoes_video_tiktok = tiktok_informacoes_video(link_recebido)
-            return informacoes_video_tiktok
-        except:
-            raise HTTPException(
-            status_code=400, 
-            detail="Erro na busca de informações no vídeo"
-            )
-    else:
+    try:
+        informacoes_video_tiktok = tiktok_informacoes_video(link_recebido) #Dentro da função já tem a segurança
+        return informacoes_video_tiktok
+    except:
         raise HTTPException(
-            status_code=400, 
-            detail="Link inválido ou malicioso."
+        status_code=400, 
+        detail="Erro na busca de informações no vídeo"
         )
 
 @router.post("/baixar_video_tiktok")

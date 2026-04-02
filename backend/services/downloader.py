@@ -1,6 +1,7 @@
 import yt_dlp
 import os
 import bleach
+import subprocess
 
 #Caminhos Absolutos para Não dar erro
 PASTA_ATUAL = os.path.dirname(os.path.abspath(__file__))
@@ -163,22 +164,25 @@ def tiktok_informacoes_video(url):
         'no_warnings': True,
         'extract_flat': False, 
     }
-    with yt_dlp.YoutubeDL(opcoes) as ydl:
-        informacoes = ydl.extract_info(url, download=False)
-        return {
-            "titulo": informacoes.get('title') or informacoes.get('description'),
-            "thumb": informacoes.get('thumbnail'),
-            "views": informacoes.get('view_count'),
-            "likes": informacoes.get('like_count'),
-            "autor": informacoes.get('uploader') or informacoes.get('uploader_id'),
-            "duracao": informacoes.get('duration'),
-            "altura": informacoes.get('height'),
-            "largura": informacoes.get('width')
-        }
+    url = limpar_link_contra_scripts(url)
+    try:
+        with yt_dlp.YoutubeDL(opcoes) as ydl:
+            informacoes = ydl.extract_info(url, download=False)
+            return {
+                "titulo": informacoes.get('title') or informacoes.get('description'),
+                "thumb": informacoes.get('thumbnail'),
+                "views": informacoes.get('view_count'),
+                "likes": informacoes.get('like_count'),
+                "autor": informacoes.get('uploader') or informacoes.get('uploader_id'),
+                "duracao": informacoes.get('duration'),
+                "altura": informacoes.get('height'),
+                "largura": informacoes.get('width')
+            }
+    except:
+        return None
     
 def tiktok_baixar_videos(url):
     os.makedirs(PASTA_DOWNLOADS, exist_ok=True) #Se a pasta nao existir ele cria
-
     opcoes = {
         'format': 'best', # Só baixa o melhor que tiver
         'outtmpl': os.path.join(PASTA_DOWNLOADS, '%(title)s.%(ext)s'),
@@ -189,8 +193,25 @@ def tiktok_baixar_videos(url):
     }
     with yt_dlp.YoutubeDL(opcoes) as ydl:
             info = ydl.extract_info(url, download=True)
-            return ydl.prepare_filename(info)
-    
+            caminho_arquivo_bruto = ydl.prepare_filename(info) #Não foi convertido
+    caminho_convertido = caminho_arquivo_bruto.rsplit('.', 1)[0] + "_ready.mp4"
+    comando_ffmeg = [
+        CAMINHO_FFMPEG,
+        '-i', caminho_arquivo_bruto,         # Entrada
+        '-c:v', 'libx264',           # Força H.264 (Universal)
+        '-c:a', 'aac',               # Áudio AAC (Universal)
+        '-pix_fmt', 'yuv420p',        # Tira a tela preta
+        '-preset', 'ultrafast',       # Pra não demorar uma eternidade
+        '-y',                         # Sobrescreve se já existir
+        caminho_convertido           # Saída
+    ]
+    try:
+        subprocess.run(comando_ffmeg, check=True)
+        if os.path.exists(caminho_arquivo_bruto):
+            os.remove(caminho_arquivo_bruto)
+        return caminho_convertido
+    except:
+        return None
 def tiktok_baixar_audio(url):
     os.makedirs(PASTA_DOWNLOADS, exist_ok=True) #Se a pasta nao existir ele cria
     opcoes = {

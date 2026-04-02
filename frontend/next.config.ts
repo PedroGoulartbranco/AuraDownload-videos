@@ -7,5 +7,23 @@ const nextConfig = {
       { protocol: 'https', hostname: '**.ytimg.com' },
     ],
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)', // Aplica em todas as páginas do site
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'none';",
+          },
+        ],
+      },
+    ]
+  },
+  // ... outras configs (como images)
 };
 export default nextConfig;

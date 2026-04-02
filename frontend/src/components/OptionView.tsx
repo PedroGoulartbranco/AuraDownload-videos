@@ -35,12 +35,6 @@ export function OptionsView({ videoData, onLoadResolutions, onLoadAudio, loading
           {isTiktok ? (isDownloadingAudio ? "BAIXANDO..." : "MP3") : (loadingAudio ? "LENDO..." : "MP3")}
         </button>
       </div>
-
-      <div className="px-4 w-full">
-        <button onClick={() => setShowAnalysis(!showAnalysis)} className="w-full py-5 border-2 border-zinc-200 rounded-[2rem] font-black text-zinc-500 hover:bg-zinc-50 transition-all flex items-center justify-center gap-3 mb-4">
-          <FileSearch size={20}/> {showAnalysis ? "FECHAR RESUMO" : "VER ANÁLISE DA IA"}
-        </button>
-      </div>
     </motion.div>
   )
 }

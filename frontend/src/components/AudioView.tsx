@@ -22,7 +22,7 @@ export function AudioView({
     >
       <div className="bg-white p-6 sm:p-8 rounded-[3rem] border border-zinc-100 shadow-xl w-full text-left">
 
-        {/* Header */}
+        { }
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={() => setView("options")}
@@ -73,7 +73,7 @@ export function AudioView({
                   </div>
                 </div>
                 
-                {/* TAMANHO COM ÍCONE DE MEMÓRIA (Ajustado para combinar com o VideoView) */}
+                { }
                 <div className="flex flex-col items-end">
                     <span className="text-[10px] font-bold opacity-60 flex items-center gap-1 uppercase tracking-tighter">
                         <HardDrive size={10} className="opacity-50" />
@@ -89,7 +89,7 @@ export function AudioView({
           )}
         </div>
 
-        {/* Botão de Download */}
+        { }
         <button
           onClick={onDownload}
           disabled={isDownloading || (audioResolutions?.length || 0) === 0}

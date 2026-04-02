@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aura Summarizer | Resumos Inteligentes",
-  description: "Transforme vídeos do YouTube, TikTok e X em resumos e downloads instantâneos. Desenvolvido por Vitor Rovani e Pedro Goulart.",
+  title: "Flux Media | Download de Vídeos e Áudios",
+  description: "A plataforma mais rápida para baixar vídeos e áudios do YouTube e TikTok em alta qualidade. Desenvolvido por Vitor Rovani e Pedro Goulart.",
   icons: {
     icon: "/favicon.ico", 
   }

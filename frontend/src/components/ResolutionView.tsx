@@ -38,7 +38,7 @@ export function ResolutionView({
           <div className="w-8" />
         </div>
 
-        {/* Lista de Resoluções */}
+        { }
         <div className="space-y-2 mb-8 max-h-[280px] overflow-y-auto pr-2 custom-scrollbar">
           {resolutions.map((res: any) => (
             <button
@@ -65,7 +65,7 @@ export function ResolutionView({
                 </div>
               </div>
 
-              {/* TAMANHO ESTIMADO: Adicionei o símbolo "~" e deixei a HardDrive mais sutil */}
+              { }
               <div className="flex flex-col items-end">
                 <span className="text-[10px] font-bold flex items-center gap-1">
                   <HardDrive size={10} className="opacity-50" />

@@ -93,5 +93,5 @@ This project was engineered and developed by:
 ---
 
 <p align="center">
-  <b>FluxMedia © 2026 - Intelligent Systems</b>
+  <b>FluxMedia © 2026</b>
 </p>

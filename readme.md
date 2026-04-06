@@ -87,7 +87,7 @@ This project was engineered and developed by:
 
 | Name | Role | Profile |
 | :--- | :--- | :--- |
-| **Vitor Rovani Marcelino** | Lead Frontend & UX/UI Designer | [GitHub](https://github.com/vitor-rovani) |
+| **Vitor Rovani Marcelino** | Lead Frontend & UX/UI Designer | [GitHub](https://github.com/VitorRovaniMarcelino) |
 | **Pedro Goulart Branco** | Lead Backend & Systems Architect | [GitHub](https://github.com/PedroGoulartbranco) |
 
 ---

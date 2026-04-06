@@ -49,26 +49,50 @@
 ### Installation & Running
 
 #### 1. Clone the repository
+
 ```bash
 git clone https://github.com/PedroGoulartbranco/AuraDownload-videos
 cd FluxMedia
-2. Setup Backend (Python)
-code
-Bash
+```
+
+#### 2. Setup Backend (Python)
+
+```bash
 cd backend
 python -m venv venv
-# Activate virtual environment:
-# Windows: .\venv\Scripts\activate | Mac/Linux: source venv/bin/activate
+```
+### Activate virtual environment:
+
+#### Windows:
+
+```bash
+.\venv\Scripts\activate
+```
+
+#### Mac/Linux:
+
+```bash
+source venv/bin/activate
+```
+
+#### Install dependencies
+
+```bash
 pip install -r requirements.txt
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-3. Setup Frontend (Next.js)
-code
-Bash
+```
+
+#### 3. Setup Frontend (Next.js)
+
+```bash
 cd ../frontend
+```
+```bash
 npm install
 npm run dev
-The application will be available at http://localhost:3000.
 ```
+The application will be available at http://localhost:3000.
+
 ---
 
 ## 🔒 Security Highlights

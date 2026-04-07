@@ -39,6 +39,16 @@
 
 ---
 
+## ⚠️ Infrastructure & Deploy Note
+
+During development, we identified technical constraints for hosting this engine on free cloud tiers (such as **Render** or **Vercel**):
+
+* **IP Reputation:** Cloud datacenters are frequently flagged by streaming platforms (YouTube/TikTok), leading to "Bot Detection" challenges and sign-in requirements.
+* **Media Processing:** High-quality merging and transcoding via **FFmpeg** require CPU and RAM resources that often exceed free-tier limits.
+* **Recommendation:** This project is optimized for **Local Execution** or servers with **Residential Proxies** to ensure 100% extraction success and performance.
+
+---
+
 ## 🏁 Getting Started
 
 ### Prerequisites

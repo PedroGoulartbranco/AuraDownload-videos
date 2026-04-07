@@ -32,7 +32,8 @@ export async function fetchYoutubeAudioQualities(url: string) {
 }
 
 export async function downloadVideo(url: string, res: string, platform: string) {
-  const isYoutube = platform === 'youtube';
+  const isYoutube = url.includes("youtube.com") || url.includes("youtu.be");
+  
   const endpoint = isYoutube ? '/baixar_video_youtube' : '/baixar_video_tiktok';
   
   const bodyData = isYoutube 

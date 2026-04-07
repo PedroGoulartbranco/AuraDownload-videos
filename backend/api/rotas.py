@@ -37,6 +37,7 @@ async def youtube_baixar_video(qualidade: VideoQuality, background_tasks: Backgr
     async with download_limite:
         link_recebido = qualidade.url
         qualidade_video = qualidade.resolution
+        print(qualidade)
         link_seguro, link_recebido = verificar_link_youtube(link_recebido)
         if link_seguro:
             try:

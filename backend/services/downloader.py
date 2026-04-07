@@ -2,6 +2,7 @@ import yt_dlp
 import os
 import bleach
 import subprocess
+import shutil
 
 #Caminhos Absolutos para Não dar erro
 PASTA_ATUAL = os.path.dirname(os.path.abspath(__file__))
@@ -262,3 +263,9 @@ def verificar_link_tiktok(url):
             return True, link_limpado
     except:
         return False, link_limpado
+
+def limpar_pasta_downloads():
+    if os.path.exists(PASTA_DOWNLOADS):
+        shutil.rmtree(PASTA_DOWNLOADS)
+    
+    os.makedirs(PASTA_DOWNLOADS, exist_ok=True)

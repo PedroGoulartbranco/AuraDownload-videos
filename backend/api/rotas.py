@@ -211,4 +211,4 @@ def tiktok_baixar_audio_rota(requisicao: VideoRequest, background_tasks: Backgro
         raise HTTPException(
             status_code=400, 
             detail="Link inválido ou malicioso."
-        )
+        ) 

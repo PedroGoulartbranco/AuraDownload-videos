@@ -117,7 +117,7 @@ async def youtube_mandar_tamanho(requisicao: VideoRequest):
             detail="Link inválido, malicioso ou playlist não suportada."
         )
 
-@router.post("/youtube_audio_tamanho")
+@router.post("/youtube_audio_qualidade")
 async def youtube_audio_mandar_tamanho(requisicao: VideoRequest):
     link_recebido = requisicao.url
     link_seguro, link_recebido = verificar_link_youtube(link_recebido)

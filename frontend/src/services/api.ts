@@ -1,4 +1,4 @@
-const BACKEND_URL = "http://26.44.44.119:8000";
+const BACKEND_URL = "http://localhost:8000";
 
 export async function sendLinkToBackend(url: string, endpoint: string) {
   const response = await fetch(`${BACKEND_URL}${endpoint}`, {

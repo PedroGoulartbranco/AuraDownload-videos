@@ -126,9 +126,9 @@ This project was engineered and developed by:
 
 ---
 
-## 🚀 Demonstração
+## 🚀 Demo
 
-![Interface do FluxMedia](./img/video.gif)
+![Interface FluxMedia](./img/video.gif)
 
 <p align="center">
   <b>FluxMedia © 2026</b>

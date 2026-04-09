@@ -56,13 +56,13 @@ def youtube_baixar_video(qualidade: VideoQuality, background_tasks: BackgroundTa
             limpar_pasta_downloads()
             raise HTTPException( #caso de erro mesmo com a função dando certa
                 status_code=400, 
-                detail="Falha no dowload do arquivo"
+                detail="Falha no dowload do arquivo. Verifique se o FFMPEG está instalado!"
             )
         except: #Caso de erro na função em geral por causa do link
             limpar_pasta_downloads()
             raise HTTPException(
                 status_code=400, 
-                detail="Não foi possível baixar o vídeo. Verifique se o link do YouTube é válido ou se a qualidade escolhida está disponível."
+                detail="Não foi possível baixar o vídeo. Verifique se o FFMPEG está instalado!"
             )
     else: #Caso não seja seguro
         raise HTTPException(
@@ -92,13 +92,13 @@ def youtube_baixar_video(background_tasks: BackgroundTasks, request: Request, qu
             limpar_pasta_downloads()
             raise HTTPException(
                 status_code=400, 
-                detail="Não foi possível baixar o áudio. Verifique se o link do YouTube é válido ou se a qualidade escolhida está disponível."
+                detail="Não foi possível baixar o áudio. Verifique se o FFMPEG está instalado!"
             )
         except:
             limpar_pasta_downloads()
             raise HTTPException(
                 status_code=400, 
-                detail="Não foi possível baixar o áudio. Verifique se o link do YouTube é válido ou se a qualidade escolhida está disponível."
+                detail="Não foi possível baixar o áudio. Verifique se o FFMPEG está instalado!"
             )
     else: #Caso não seja seguro o link
         raise HTTPException(
@@ -176,7 +176,7 @@ def tiktok_baixar_video_rota(requisicao: VideoRequest, background_tasks: Backgro
             limpar_pasta_downloads()
             raise HTTPException(
                 status_code=400, 
-                detail="Erro no download."
+                detail="Erro no download. Verifique se o FFMPEG está instalado!"
             )
     else:
         raise HTTPException(
@@ -205,7 +205,7 @@ def tiktok_baixar_audio_rota(requisicao: VideoRequest, background_tasks: Backgro
             limpar_pasta_downloads()
             raise HTTPException(
                 status_code=400, 
-                detail="Erro no download."
+                detail="Erro no download. Verifique se o FFMPEG está instalado!"
             )
     else:
         raise HTTPException(

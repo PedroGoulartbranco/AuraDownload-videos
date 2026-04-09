@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.rotas import router, limiter
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+import shutil
+import sys
 
 app = FastAPI()
 
@@ -19,6 +21,16 @@ app.add_middleware(
 
 app.include_router(router)
 
+def verificar_ffmpeg_no_projeto():
+    if shutil.which("ffmpeg") is None:
+        print("\n" + "-"*50)
+        print("ERRO: FFmpeg não encontrado no sistema.")
+        print("Certifique-se de que o ffmpeg.exe está na pasta do backend")
+        print("-"*50 + "\n")
+    else:
+        print("FFMPEG está pronto")
+
 if __name__ == "__main__":
+    verificar_ffmpeg_no_projeto()
     import uvicorn #Biblioteca que faz a ligação do codigo com a web
     uvicorn.run(app, host="0.0.0.0", port=8000)

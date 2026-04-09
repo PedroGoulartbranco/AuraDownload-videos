@@ -22,7 +22,8 @@ app.add_middleware(
 app.include_router(router)
 
 def verificar_ffmpeg_no_projeto():
-    if shutil.which("ffmpeg") is None:
+    # Verifica se o executável do FFmpeg está acessível no sistema ou na pasta do projeto, ele percorre o caminho do executavel
+    if shutil.which("ffmpeg") is None: 
         print("\n" + "-"*50)
         print("ERRO: FFmpeg não encontrado no sistema.")
         print("Certifique-se de que o ffmpeg.exe está na pasta do backend")

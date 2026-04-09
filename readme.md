@@ -9,6 +9,12 @@
 
 ---
 
+## 🚀 Demo
+
+![Interface FluxMedia](./img/video.gif)
+
+---
+
 ## 🚀 Key Features
 
 *   *Multi-Platform Support:* 
@@ -123,12 +129,6 @@ This project was engineered and developed by:
 | :--- | :--- | :--- |
 | **Vitor Rovani Marcelino** | Lead Frontend & UX/UI Designer | [GitHub](https://github.com/VitorRovaniMarcelino) |
 | **Pedro Goulart Branco** | Lead Backend & Systems Architect | [GitHub](https://github.com/PedroGoulartbranco) |
-
----
-
-## 🚀 Demo
-
-![Interface FluxMedia](./img/video.gif)
 
 <p align="center">
   <b>FluxMedia © 2026</b>

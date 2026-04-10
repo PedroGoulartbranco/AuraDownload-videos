@@ -10,6 +10,9 @@ PASTA_BACKEND = os.path.abspath(os.path.join(PASTA_ATUAL, ".."))
 PASTA_DOWNLOADS = os.path.join(PASTA_BACKEND, "downloads")
 CAMINHO_FFMPEG = os.path.join(PASTA_BACKEND, "ffmpeg.exe")
 
+lista_qualidade_shorts = ["1080", "1440", "720", "480", "360", "240", "144"]
+lista_qualidade_videos = ["1080", "1440", "720", "480", "360", "240", "144", "2160", "4320"]
+
 def youtube_informacoes_video(url):
     opcoes = {
         'quiet': True,           # Não enche o terminal de mensagens
@@ -33,6 +36,11 @@ def youtube_informacoes_video(url):
 def limpar_link_contra_scripts(url):
     url_limpa = bleach.clean(url, tags=[], attributes={}, strip=True) #Faz alimpeza
     return url_limpa
+
+def verificar_se_e_shorts(url):
+    if "youtube.com/shorts/" in url or "youtu.be/shorts/" in url:
+        return True
+    return False
     
 def verificar_link_youtube(url):
     url_limpa = limpar_link_contra_scripts(url)
@@ -109,7 +117,12 @@ def mandar_tamanho_resolucoes(url):
                 if int(altura) != 608 and int(altura) != 2160:
                     tamanho = tamanho / (1024 * 1024) #Tranformas em MB
                     tamanho = round(tamanho + audio_estimado_mb, 2)
-                    tamanhos_por_resolucao[f"tamanho_{altura}"] = tamanho
+                    if verificar_se_e_shorts(url):
+                        if str(altura) in lista_qualidade_shorts:
+                            tamanhos_por_resolucao[f"tamanho_{altura}"] = tamanho
+                            print(altura)
+                    else:
+                        tamanhos_por_resolucao[f"tamanho_{altura}"] = tamanho
     return tamanhos_por_resolucao
 
 def youtube_mandar_audio_tamanho(url):

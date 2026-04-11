@@ -120,8 +120,9 @@ def mandar_tamanho_resolucoes(url):
                     if verificar_se_e_shorts(url):
                         if str(altura) in lista_qualidade_shorts:
                             tamanhos_por_resolucao[f"tamanho_{altura}"] = tamanho
-                            print(altura)
                     else:
+                        if str(altura) in lista_qualidade_videos:
+                            tamanhos_por_resolucao[f"tamanho_{altura}"] = tamanho
                         tamanhos_por_resolucao[f"tamanho_{altura}"] = tamanho
     return tamanhos_por_resolucao
 
